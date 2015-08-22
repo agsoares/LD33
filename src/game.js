@@ -4,7 +4,9 @@ app.Game = function() {};
 
 var map = [];
 var tileSize = 32;
-var gridSize = { width: 5, height: 5 };
+var gridSize = { width: 16, height: 17 };
+
+var turnTimer = 0;
 
 var player =  {
     sprite : {},
@@ -27,12 +29,10 @@ app.Game.prototype = {
             map[i] = [];
             for (j = 0 ; j < gridSize.width; j++ ) {
                 map[i][j] = 0;
-                var pos = this.returnGridPos({x: i, y: j});
+                var pos = this.returnGridPos({x: j, y: i});
                 var tile = app.game.add.sprite(pos.x, pos.y, 'tileset', map[i][j]);
             }
         }
-
-
 
         var gridPos = this.returnGridPos(player.pos);
         player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 2);
@@ -48,27 +48,31 @@ app.Game.prototype = {
         return true;
     },
     update: function() {
-        var newPos = { x: player.pos.x, y: player.pos.y };
-        if (app.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-            newPos.x--;
 
-        } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-            newPos.x++;
+        turnTimer-= app.game.time.elapsed/100;
+        if (turnTimer <= 0 ) {
+            var newPos = { x: player.pos.x, y: player.pos.y };
+            if (app.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+                newPos.x--;
 
-        } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
-            newPos.y--;
+            } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+                newPos.x++;
 
-        } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
-            newPos.y++;
+            } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+                newPos.y--;
+
+            } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
+                newPos.y++;
+            }
+
+            if (this.canMoveToTile(newPos) && (player.pos.x != newPos.x || player.pos.y != newPos.y)) {
+                console.log("wut");
+                turnTimer = 0.75;
+                player.pos = newPos;
+                var gridPos = this.returnGridPos(player.pos);
+                player.sprite.x = gridPos.x;
+                player.sprite.y = gridPos.y;
+            }
         }
-
-        if (this.canMoveToTile(newPos)) {
-            player.pos = newPos;
-            var gridPos = this.returnGridPos(player.pos);
-            player.sprite.x = gridPos.x;
-            player.sprite.y = gridPos.y;
-        }
-
-
     }
 };
