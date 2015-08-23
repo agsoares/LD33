@@ -60,7 +60,7 @@ app.Game.prototype = {
         easystar = new EasyStar.js();
         easystar.setGrid(map);
         easystar.setAcceptableTiles([tileID.free]);
-        easystar.setTileCost(tileID.player, 100);
+        easystar.setTileCost(tileID.player, 1000);
 
         this.spawnEnemy();
 
@@ -75,6 +75,10 @@ app.Game.prototype = {
                         if (path.length > 0) {
                             this.pos.x = path[1].x;
                             this.pos.y = path[1].y;
+                        } else {
+                            var index = enemies.indexOf(this);
+                            enemies.splice(index, 1);
+                            this.sprite.destroy();
                         }
                     }
                 }).bind(this));
@@ -118,6 +122,7 @@ app.Game.prototype = {
                 map[newPos.y][newPos.x]         = tileID.player;
                 player.pos = newPos;
                 var gridPos = this.returnGridPos(player.pos);
+                easystar.setGrid(map);
                 player.sprite.x = gridPos.x;
                 player.sprite.y = gridPos.y;
                 turn = 1;
