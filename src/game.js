@@ -145,9 +145,6 @@ app.Game.prototype = {
                 newPos.x--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
                 newPos.x++;
-                player.takeDamage();
-                console.log(player.health);
-                console.log(player.isDead());
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
                 newPos.y--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
