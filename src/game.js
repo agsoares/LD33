@@ -62,6 +62,7 @@ var labelScore;
 var canSpawnWave = true;
 var enemies = [];
 var hearts = [];
+var obstacles = [];
 var background_layer;
 var characters_layer;
 var hud_layer;
@@ -86,6 +87,7 @@ app.Game.prototype = {
         turn = turnID.player;
         enemies = [];
         hearts = [];
+        obstacles = [];
         background_layer = app.game.add.group();
         foreground_layer = app.game.add.group();
         hud_layer        = app.game.add.group();
@@ -106,7 +108,7 @@ app.Game.prototype = {
             }
         }
 
-
+        this.spawnObstacles(5);
 
 
 
@@ -137,6 +139,27 @@ app.Game.prototype = {
     addScore: function(){
       score += scorePerKIll;
       labelScore.text = score.toString();
+    },
+
+    spawnObstacles: function (quantity){
+      var obstacle = {
+          sprite : {},
+          pos : {
+              x:0,
+              y:0
+          },
+      };
+      for(i = 0; i < quantity; i++){
+        obstacle.pos.x = this.randomIntFromInterval(1,gridSize.width-1);
+        obstacle.pos.y = this.randomIntFromInterval(1,gridSize.height-1);
+        var obstaclePos = this.returnScreenPos(obstacle.pos);
+        obstacle.sprite = app.game.add.sprite(obstaclePos.x,obstaclePos.y, 'tileset', 3);
+        map[obstacle.pos.y][obstacle.pos.x] = tileID.obstacle;
+        background_layer.add(obstacle.sprite);
+        obstacles.push(obstacle);
+      }
+
+
     },
 
     spawnEnemy: function () {
@@ -261,12 +284,12 @@ app.Game.prototype = {
         if (this.isTileOffBoardLimits(pos)) {
             return false;
         }
-/**
-        if(map[pos.y][pos.x] != tileID.free) {
+
+        if(map[pos.y][pos.x] == tileID.obstacle) {
 
             return false;
         }
-  **/
+
         return true;
     },
     canAttackTile : function (pos, type) {
