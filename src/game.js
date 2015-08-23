@@ -10,8 +10,6 @@ var tileID = {
     exit    : 4
 };
 
-
-
 var turn = 0;
 var easystar;
 
@@ -69,12 +67,14 @@ app.Game.prototype = {
         var enemy = {
             sprite : {},
             pos : {x:0, y:gridSize.height-1},
+            parent: this,
             think: function () {
                 easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
                     if (path !== null) {
-                        if (path.length > 0) {
+                        if (path.length > 0 && this.parent.canMoveToTile(path[1])) {
                             this.pos.x = path[1].x;
                             this.pos.y = path[1].y;
+                            this.parent.canMoveToTile(this.pos);
                         } else {
                             var index = enemies.indexOf(this);
                             enemies.splice(index, 1);
