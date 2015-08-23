@@ -29,6 +29,7 @@ var player =  {
     takeDamage : function(){
         if(this.health > 0){
           this.health--;
+          console.log(this.health);
         }
     },
     isDead: function(){
@@ -87,6 +88,12 @@ app.Game.prototype = {
             },
             parent: this,
             think: function () {
+              if(this.isPlayerOnAdjacentTiles(this.pos)){
+                player.takeDamage();
+                if(player.isDead()){
+                  player.sprite.destroy();
+                }
+              }else{
                 easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
                     if (path !== null) {
                         if (path.length > 0) {
@@ -104,6 +111,15 @@ app.Game.prototype = {
                     }
                 }).bind(this));
                 easystar.calculate();
+              }
+            },
+            isPlayerOnAdjacentTiles : function(pos){
+                var playerPos = player.pos;
+                var distance = ({x: Math.abs(pos.x-player.pos.x), y: Math.abs(pos.y-player.pos.y)});
+                if(distance.x + distance.y == 1){
+                  return true;
+                }
+                return false
             },
             remove: function () {
                 var index = enemies.indexOf(this);
@@ -115,6 +131,18 @@ app.Game.prototype = {
         enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
         enemies.push(enemy);
     },
+    isTileOffBoardLimits : function(pos){
+      if (pos.x < 0 || pos.x >= gridSize.width) {
+          return true;
+      }
+      if (pos.y < 0 || pos.y >= gridSize.height) {
+          return true;
+        }
+      return false;
+    },
+
+
+
     checkEnemy: function (pos) {
         for (i =  0; i < enemies.length; i++) {
             if (enemies[i].pos.x == pos.x && enemies[i].pos.y == pos.y) {
@@ -125,12 +153,10 @@ app.Game.prototype = {
         }
     },
     canMoveToTile : function (pos) {
-        if (pos.x < 0 || pos.x >= gridSize.width) {
+        if (this.isTileOffBoardLimits(pos)) {
             return false;
         }
-        if (pos.y < 0 || pos.y >= gridSize.height) {
-            return false;
-        }
+
         if(map[pos.y][pos.x] != tileID.free) {
 
             return false;
