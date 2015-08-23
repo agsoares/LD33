@@ -19,7 +19,7 @@ var turn = turnID.player;
 var easystar;
 var score = 0;
 var scorePerKIll = 10;
-var heartDropChance = 100;
+var heartDropChance = 20;
 
 var map = [];
 var tileSize = 32;
@@ -42,6 +42,12 @@ var player =  {
           labelLife.text = this.health.toString();
         }
     },
+    heal: function(){
+      if(this.health < playerTotalHealth){
+        this.health++;
+        labelLife.text = this.health.toString();
+      }
+    },
     isDead: function(){
         if(this.health > 0){
           return false;
@@ -50,11 +56,6 @@ var player =  {
     }
 };
 
-var heart = {
-  sprite : {},
-  pos : {},
-  lifespan : 3
-};
 
 var labelLife;
 var labelScore;
@@ -189,6 +190,23 @@ app.Game.prototype = {
                 return false;
             },
             dropHeart: function(){
+              var heart = {
+                sprite : {},
+                pos : {},
+                lifespan : 3,
+                checkLifespan : function () {
+                  this.lifespan--;
+                  if(this.lifespan <= 0){
+                    this.remove();
+                  }
+                },
+                remove: function () {
+                    var index = hearts.indexOf(this);
+                    hearts.splice(index,1);
+                    this.sprite.destroy();
+                }
+              };
+
               var chance = this.parent.randomIntFromInterval(1,100);
               if(chance < heartDropChance){
                 heart.sprite = app.game.add.sprite(this.sprite.x,this.sprite.y, 'tileset', 2);
@@ -229,11 +247,11 @@ app.Game.prototype = {
       }
     },
 
-    checkEnemy: function (pos) {
-        for (i =  0; i < enemies.length; i++) {
-            if (enemies[i].pos.x == pos.x && enemies[i].pos.y == pos.y) {
-                enemies[i].dropHeart();
-                enemies[i].remove();
+    checkHearth: function (pos) {
+        for (i =  0; i < hearts.length; i++) {
+            if (hearts[i].pos.x == pos.x && hearts[i].pos.y == pos.y) {
+                player.heal();
+                hearts[i].remove();
                 return true;
             }
             return false;
@@ -303,6 +321,7 @@ app.Game.prototype = {
                   }
 
                 } else {
+                    this.checkHearth(newPos);
                     map[player.pos.y][player.pos.x] = tileID.free;
                     map[newPos.y][newPos.x]         = tileID.player;
                     player.pos = newPos;
@@ -310,7 +329,9 @@ app.Game.prototype = {
                     player.sprite.x = gridPos.x;
                     player.sprite.y = gridPos.y;
                     waveTimer--;
-
+                    for (i =  0; i < hearts.length; i++) {
+                        hearts[i].checkLifespan();
+                    }
                 }
                 turn = turnID.enemy;
             }
