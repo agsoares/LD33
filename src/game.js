@@ -19,6 +19,7 @@ var turn = turnID.player;
 var easystar;
 var score = 0;
 var scorePerKIll = 10;
+var heartDropChance = 100;
 
 var map = [];
 var tileSize = 32;
@@ -34,7 +35,7 @@ var playerTotalHealth = 6;
 var player =  {
     sprite : {},
     pos : {x:0,y: 0},
-    health: playerTotalHealth,
+    health : playerTotalHealth,
     takeDamage : function(){
         if(this.health > 0){
           this.health--;
@@ -49,11 +50,17 @@ var player =  {
     }
 };
 
+var heart = {
+  sprite : {},
+  pos : {},
+  lifespan : 3
+};
+
 var labelLife;
 var labelScore;
 var canSpawnWave = true;
 var enemies = [];
-
+var hearts = [];
 var background_layer;
 var characters_layer;
 var hud_layer;
@@ -77,6 +84,7 @@ app.Game.prototype = {
         canSpawnWave = true;
         turn = turnID.player;
         enemies = [];
+        hearts = [];
         background_layer = app.game.add.group();
         foreground_layer = app.game.add.group();
         hud_layer        = app.game.add.group();
@@ -92,7 +100,7 @@ app.Game.prototype = {
             for (j = 0 ; j < gridSize.width; j++ ) {
                 map[i][j] = tileID.free;
                 var pos = this.returnScreenPos({x: j, y: i});
-                var tile = app.game.add.sprite(pos.x, pos.y, 'tileset', map[i][j]);
+                var tile = app.game.add.sprite(pos.x, pos.y, 'tileset', 6);
                 background_layer.add(tile);
             }
         }
@@ -103,7 +111,7 @@ app.Game.prototype = {
 
         var gridPos = this.returnScreenPos(player.pos);
         map[player.pos.y][player.pos.x] = tileID.player;
-        player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 2);
+        player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 1);
 
         easystar = new EasyStar.js();
         easystar.setGrid(map);
@@ -179,6 +187,15 @@ app.Game.prototype = {
                 }
                 return false;
             },
+            dropHeart: function(){
+              var chance = this.parent.randomIntFromInterval(1,100);
+              if(chance < heartDropChance){
+                heart.sprite = app.game.add.sprite(this.sprite.x,this.sprite.y, 'tileset', 2);
+                heart.pos.x = this.pos.x;
+                heart.pos.y = this.pos.y;
+                hearts.push(heart);
+              }
+            },
             remove: function () {
                 var index = enemies.indexOf(this);
                 enemies.splice(index,1);
@@ -189,7 +206,7 @@ app.Game.prototype = {
             }
         };
         var enemyPos = this.returnScreenPos(enemy.pos);
-        enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
+        enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 5);
         enemies.push(enemy);
     },
     isTileOffBoardLimits : function(pos){
@@ -212,6 +229,7 @@ app.Game.prototype = {
     checkEnemy: function (pos) {
         for (i =  0; i < enemies.length; i++) {
             if (enemies[i].pos.x == pos.x && enemies[i].pos.y == pos.y) {
+                enemies[i].dropHeart();
                 enemies[i].remove();
                 return true;
             }
@@ -276,6 +294,7 @@ app.Game.prototype = {
                       if (enemies[i].pos.x == newPos.x && enemies[i].pos.y == newPos.y) {
                           this.addScore();
                           map[newPos.y][newPos.x] = tileID.free;
+                          enemies[i].dropHeart();
                           enemies[i].remove();
                       }
                   }
