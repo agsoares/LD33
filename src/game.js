@@ -12,7 +12,8 @@ var tileID = {
 
 var turn = 0;
 var easystar;
-
+var score = 0;
+var scorePerKIll = 10;
 
 var map = [];
 var tileSize = 32;
@@ -30,6 +31,7 @@ var player =  {
     takeDamage : function(){
         if(this.health > 0){
           this.health--;
+          labelLife.text = this.health.toString();
           console.log(this.health);
         }
     },
@@ -105,6 +107,10 @@ app.Game.prototype = {
       canSpawnWave = false;
     },
 
+    addScore: function(){
+      score += scorePerKIll;
+    },
+
     spawnEnemy: function () {
         var enemy = {
             sprite : {},
@@ -115,6 +121,7 @@ app.Game.prototype = {
             parent: this,
             think: function () {
                 if (this.pos.x == player.pos.x && this.pos.y == player.pos.y) {
+                    this.parent.addScore();
                     this.remove();
                     return;
                 }
@@ -239,15 +246,16 @@ app.Game.prototype = {
             }
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
-                console.log("fora "+this.canAttackTile(newPos,tileID.enemy));
+
                 if(this.canAttackTile(newPos,tileID.enemy)) {
                   for (i =  0; i < enemies.length; i++) {
                       if (enemies[i].pos.x == newPos.x && enemies[i].pos.y == newPos.y) {
+                          this.addScore();
                           map[newPos.y][newPos.x] = tileID.free;
                           enemies[i].remove();
                       }
                   }
-                  console.log("Matei.");
+                //  console.log("Matei.");
 
                 } else {
                     map[player.pos.y][player.pos.x] = tileID.free;
@@ -259,7 +267,7 @@ app.Game.prototype = {
                     waveTimer--;
 
                 }
-
+                console.log(score);
                 turn = 1;
             }
         }
