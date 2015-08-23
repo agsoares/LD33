@@ -94,7 +94,7 @@ app.Game.prototype = {
             return false;
         }
       //  var gridPosition = this.returnGridPos(pos);
-        if(map[pos.y][pos.x] == 0)
+        if(map[pos.y][pos.x] == tileID.free)
           return true;
 
         return false;
