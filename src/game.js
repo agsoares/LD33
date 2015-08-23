@@ -66,13 +66,16 @@ app.Game.prototype = {
             }
         }
 
+
+
+
         var gridPos = this.returnScreenPos(player.pos);
         map[player.pos.y][player.pos.x] = tileID.player;
         player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 2);
 
         easystar = new EasyStar.js();
         easystar.setGrid(map);
-        easystar.setAcceptableTiles([tileID.free]);
+        easystar.setAcceptableTiles([tileID.free, tileID.enemy]);
         easystar.setTileCost(tileID.free,     5);
         easystar.setTileCost(tileID.player, 100);
         easystar.setTileCost(tileID.enemy, 10);
@@ -82,6 +85,7 @@ app.Game.prototype = {
         //this.spawnEnemy();
         //this.spawnEnemy();
 
+        var labelLife = app.game.add.text(100, 100, "6", { font: "bold 32px Arial", fill: "#000000" });
     },
     spawnWave: function(enemiesQty, playerTileCost, enemyTileCost, obstacleTileCost){
       easystar.setTileCost(tileID.player, playerTileCost);
@@ -102,33 +106,37 @@ app.Game.prototype = {
             },
             parent: this,
             think: function () {
-              if(this.isPlayerOnAdjacentTiles(this.pos)){
-                player.takeDamage();
-                if(player.isDead()){
-                  player.sprite.destroy();
+                if (this.pos.x == player.pos.x && this.pos.y == player.pos.y) {
+                    this.remove();
+                    return;
                 }
-              }else{
-                easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
-                    if (path !== null) {
-                        if (path.length > 0) {
-                            if(this.parent.canMoveToTile(path[1])){
-                                map[this.pos.y][this.pos.x] = tileID.free;
-                                this.pos.x = path[1].x;
-                                this.pos.y = path[1].y;
-                                map[this.pos.y][this.pos.x] = tileID.enemy;
-                                this.parent.canMoveToTile(this.pos);
-                                var enemyPos = this.parent.returnScreenPos(this.pos);
-                                this.sprite.x = enemyPos.x;
-                                this.sprite.y = enemyPos.y;
-
-                            }
-                        } else {
-                            this.remove();
-                        }
+                if(this.isPlayerOnAdjacentTiles(this.pos)){
+                    player.takeDamage();
+                    if(player.isDead()){
+                      player.sprite.destroy();
                     }
-                }).bind(this));
-                easystar.calculate();
-              }
+                } else {
+                    easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
+                        if (path !== null) {
+                            if (path.length > 0) {
+                                if(this.parent.canMoveToTile(path[1])){
+                                    map[this.pos.y][this.pos.x] = tileID.free;
+                                    this.pos.x = path[1].x;
+                                    this.pos.y = path[1].y;
+                                    map[this.pos.y][this.pos.x] = tileID.enemy;
+                                    this.parent.canMoveToTile(this.pos);
+                                    var enemyPos = this.parent.returnScreenPos(this.pos);
+                                    this.sprite.x = enemyPos.x;
+                                    this.sprite.y = enemyPos.y;
+
+                                }
+                            } else {
+                                this.remove();
+                            }
+                        }
+                    }).bind(this));
+                    easystar.calculate();
+                }
             },
             isPlayerOnAdjacentTiles : function(pos){
                 var playerPos = player.pos;
@@ -136,7 +144,7 @@ app.Game.prototype = {
                 if(distance.x + distance.y == 1){
                   return true;
                 }
-                return false
+                return false;
             },
             remove: function () {
                 var index = enemies.indexOf(this);
@@ -203,8 +211,8 @@ app.Game.prototype = {
         turnTimer-= app.game.time.elapsed/100;
         if(canSpawnWave || waveTimer <= 0){
           enemyQty = this.randomIntFromInterval(1,4);
-          p_cost = this.randomIntFromInterval(50,500);
-          e_cost = this.randomIntFromInterval(10,100);
+          p_cost = 500;//this.randomIntFromInterval(50,500);
+          e_cost = 100;//this.randomIntFromInterval(10,100);
           o_cost = 0;
           this.spawnWave(enemyQty, 0, p_cost, e_cost, o_cost);
           waveTimer = maxTurnsToNextWave;
