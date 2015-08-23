@@ -44,6 +44,7 @@ var player =  {
 };
 
 var labelLife;
+var labelScore;
 var canSpawnWave = true;
 var enemies = [];
 
@@ -70,6 +71,9 @@ app.Game.prototype = {
 
         labelLife = app.game.add.text(0, 0, player.health, { font: "bold 32px Arial", fill: "#FFFFFF" });
         hud_layer.add(labelLife);
+        labelScore = app.game.add.text(app.game.width-90, 0, score, { font: "bold 32px Arial", fill: "#FFFFFF" });
+        labelScore.anchor.x = 0;
+        hud_layer.add(labelScore);
         for (i = 0 ; i < gridSize.height; i++ ) {
             map[i] = [];
             for (j = 0 ; j < gridSize.width; j++ ) {
@@ -109,6 +113,7 @@ app.Game.prototype = {
 
     addScore: function(){
       score += scorePerKIll;
+      labelScore.text = score.toString();
     },
 
     spawnEnemy: function () {
@@ -127,9 +132,7 @@ app.Game.prototype = {
                 }
                 if(this.isPlayerOnAdjacentTiles(this.pos)){
                     player.takeDamage();
-                    if(player.isDead()){
-                      player.sprite.destroy();
-                    }
+                    this.parent.checkGameOver();
                 } else {
                     easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
                         if (path !== null) {
@@ -147,6 +150,7 @@ app.Game.prototype = {
                                 }
                             } else {
                                 player.takeDamage();
+                                this.parent.checkGameOver();
                                 this.remove();
                             }
                         }
@@ -185,7 +189,12 @@ app.Game.prototype = {
       return false;
     },
 
-
+    checkGameOver :function(){
+      if(player.isDead()){
+        player.sprite.destroy();
+        this.state.start("GameOver");
+      }
+    },
 
     checkEnemy: function (pos) {
         for (i =  0; i < enemies.length; i++) {
