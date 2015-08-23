@@ -87,7 +87,7 @@ app.Game.prototype = {
         var gridPos = this.returnScreenPos(player.pos);
         map[player.pos.y][player.pos.x] = tileID.player;
         player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 2);
-
+        foreground_layer.add(player.sprite);
         easystar = new EasyStar.js();
         easystar.setGrid(map);
         easystar.setAcceptableTiles([tileID.free, tileID.enemy]);
@@ -172,6 +172,7 @@ app.Game.prototype = {
         };
         var enemyPos = this.returnScreenPos(enemy.pos);
         enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
+        foreground_layer.add(enemy.sprite);
         enemies.push(enemy);
     },
     isTileOffBoardLimits : function(pos){
