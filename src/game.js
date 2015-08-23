@@ -58,26 +58,37 @@ app.Game.prototype = {
         easystar = new EasyStar.js();
         easystar.setGrid(map);
         easystar.setAcceptableTiles([tileID.free]);
-        easystar.setTileCost(tileID.player, 1000);
+        easystar.setTileCost(tileID.free,     5);
+        easystar.setTileCost(tileID.player, 100);
 
+        this.spawnEnemy();
+        this.spawnEnemy();
         this.spawnEnemy();
 
     },
     spawnEnemy: function () {
         var enemy = {
             sprite : {},
-            pos : {x:0, y:gridSize.height-1},
+            pos : {
+                x:0,
+                y:Math.floor(Math.random()*(gridSize.height-2))+1
+            },
             parent: this,
             think: function () {
                 easystar.findPath(this.pos.x, this.pos.y, exit.x, exit.y, (function(path) {
                     if (path !== null) {
-                        if (path.length > 0 && this.parent.canMoveToTile(path[1])) {
-                            this.pos.x = path[1].x;
-                            this.pos.y = path[1].y;
-                            this.parent.canMoveToTile(this.pos);
+                        if (path.length > 0) {
+                            if(this.parent.canMoveToTile(path[1])){
+                                this.pos.x = path[1].x;
+                                this.pos.y = path[1].y;
+                                this.parent.canMoveToTile(this.pos);
+                                var enemyPos = this.parent.returnGridPos(this.pos);
+                                this.sprite.x = enemyPos.x;
+                                this.sprite.y = enemyPos.y;
+                            }
                         } else {
                             var index = enemies.indexOf(this);
-                            enemies.splice(index, 1);
+                            enemies.splice(index,1);
                             this.sprite.destroy();
                         }
                     }
@@ -87,7 +98,6 @@ app.Game.prototype = {
         };
         var enemyPos = this.returnGridPos(enemy.pos);
         enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
-        enemy.think();
         enemies.push(enemy);
     },
     canMoveToTile : function (pos) {
@@ -97,38 +107,32 @@ app.Game.prototype = {
         if (pos.y < 0 || pos.y >= gridSize.height) {
             return false;
         }
-      //  var gridPosition = this.returnGridPos(pos);
-        if(map[pos.y][pos.x] == tileID.free)
-          return true;
+        if(map[pos.y][pos.x] != tileID.free) {
 
-        return false;
+            return false;
+        }
+        return true;
     },
     update: function() {
-    //  app.game.time.advancedTiming = true;
-      //console.log(app.game.time.fps);
         turnTimer-= app.game.time.elapsed/100;
         if (turnTimer <= 0 ) {
             var newPos = { x: player.pos.x, y: player.pos.y };
             if (app.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
                 newPos.x--;
-
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
                 newPos.x++;
-
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
                 newPos.y--;
-
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
                 newPos.y++;
             }
 
-            if (this.canMoveToTile(newPos) && (player.pos.x != newPos.x || player.pos.y != newPos.y)) {
+            if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
                 map[player.pos.y][player.pos.x] = tileID.free;
                 map[newPos.y][newPos.x]         = tileID.player;
                 player.pos = newPos;
                 var gridPos = this.returnGridPos(player.pos);
-                easystar.setGrid(map);
                 player.sprite.x = gridPos.x;
                 player.sprite.y = gridPos.y;
                 turn = 1;
@@ -138,10 +142,9 @@ app.Game.prototype = {
 
         if (turn == 1) {
             for (i =  0; i < enemies.length; i++) {
+                console.log("meh")
                 enemies[i].think();
-                var enemyPos = this.returnGridPos(enemies[i].pos);
-                enemies[i].sprite.x = enemyPos.x;
-                enemies[i].sprite.y = enemyPos.y;
+
             }
             turn = 0;
         }
