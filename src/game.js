@@ -41,9 +41,13 @@ var player =  {
     }
 };
 
-
+var labelLife;
 var canSpawnWave = true;
 var enemies = [];
+
+var background_layer;
+var characters_layer;
+var hud_layer;
 
 
 app.Game.prototype = {
@@ -57,14 +61,23 @@ app.Game.prototype = {
         };
     },
     create: function() {
+        background_layer = app.game.add.group();
+        foreground_layer = app.game.add.group();
+        hud_layer        = app.game.add.group();
+
+
+        labelLife = app.game.add.text(0, 0, player.health, { font: "bold 32px Arial", fill: "#FFFFFF" });
+        hud_layer.add(labelLife);
         for (i = 0 ; i < gridSize.height; i++ ) {
             map[i] = [];
             for (j = 0 ; j < gridSize.width; j++ ) {
                 map[i][j] = tileID.free;
                 var pos = this.returnScreenPos({x: j, y: i});
                 var tile = app.game.add.sprite(pos.x, pos.y, 'tileset', map[i][j]);
+                background_layer.add(tile);
             }
         }
+
 
 
 
@@ -81,11 +94,6 @@ app.Game.prototype = {
         easystar.setTileCost(tileID.enemy, 10);
         easystar.setTileCost(tileID.obstacle, 50);
 
-        //this.spawnEnemy();
-        //this.spawnEnemy();
-        //this.spawnEnemy();
-
-        var labelLife = app.game.add.text(100, 100, "6", { font: "bold 32px Arial", fill: "#000000" });
     },
     spawnWave: function(enemiesQty, playerTileCost, enemyTileCost, obstacleTileCost){
       easystar.setTileCost(tileID.player, playerTileCost);
