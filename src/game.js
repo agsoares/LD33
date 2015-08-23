@@ -295,7 +295,7 @@ app.Game.prototype = {
           waveTimer = maxTurnsToNextWave;
         }
 
-        if (turnTimer <= 0 ) {
+        if (turnTimer <= 0 && turn === 0) {
             var newPos = { x: player.pos.x, y: player.pos.y };
             if (app.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
                 newPos.x--;
@@ -308,7 +308,7 @@ app.Game.prototype = {
             }
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
 
-                turnTimer = 0.75;
+                turnTimer = 2;
 
                 if(this.canAttackTile(newPos,tileID.enemy)) {
                   for (i =  0; i < enemies.length; i++) {
@@ -338,7 +338,8 @@ app.Game.prototype = {
         }
 
 
-        if (turn == 1) {
+        if (turn == 1 && turnTimer<=0) {
+            turnTimer = 0.75;
             for (i =  0; i < enemies.length; i++) {
                 enemies[i].think();
             }
