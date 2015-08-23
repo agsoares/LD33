@@ -192,7 +192,7 @@ app.Game.prototype = {
           e_cost = this.randomIntFromInterval(10,100);
           o_cost = 0;
           this.spawnWave(enemyQty, 0, p_cost, e_cost, o_cost);
-          this.waveTimer = this.maxTurnsToNextWave;
+          waveTimer = maxTurnsToNextWave;
         }
 
         if (turnTimer <= 0 ) {
