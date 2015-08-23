@@ -41,6 +41,7 @@ var player =  {
 };
 
 
+var canSpawnWave = true;
 var enemies = [];
 
 
@@ -73,12 +74,24 @@ app.Game.prototype = {
         easystar.setAcceptableTiles([tileID.free]);
         easystar.setTileCost(tileID.free,     5);
         easystar.setTileCost(tileID.player, 100);
+        easystar.setTileCost(tileID.enemy, 10);
+        easystar.setTileCost(tileID.obstacle, 50);
 
-        this.spawnEnemy();
-        this.spawnEnemy();
-        this.spawnEnemy();
+        //this.spawnEnemy();
+        //this.spawnEnemy();
+        //this.spawnEnemy();
 
     },
+    spawnWave: function(enemiesQty, playerTileCost, enemyTileCost, obstacleTileCost){
+      easystar.setTileCost(tileID.player, playerTileCost);
+      easystar.setTileCost(tileID.enemy, enemyTileCost);
+      easystar.setTileCost(tileID.obstacle, obstacleTileCost);
+      for(i = 0; i < enemiesQty; i++){
+        this.spawnEnemy();
+      }
+      canSpawnWave = false;
+    },
+
     spawnEnemy: function () {
         var enemy = {
             sprite : {},
@@ -125,6 +138,9 @@ app.Game.prototype = {
                 var index = enemies.indexOf(this);
                 enemies.splice(index,1);
                 this.sprite.destroy();
+                if(enemies.length <= 0){
+                  canSpawnWave = true;
+                }
             }
         };
         var enemyPos = this.returnGridPos(enemy.pos);
@@ -163,6 +179,10 @@ app.Game.prototype = {
         }
         return true;
     },
+    randomIntFromInterval : function(min,max)
+    {
+      return Math.floor(Math.random()*(max-min+1)+min);
+    },
     update: function() {
         turnTimer-= app.game.time.elapsed/100;
         if (turnTimer <= 0 ) {
@@ -175,8 +195,13 @@ app.Game.prototype = {
                 newPos.y--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
                 newPos.y++;
+            }else if(app.game.input.keyboard.isDown(Phaser.Keyboard.S) && canSpawnWave){
+              enemyQty = this.randomIntFromInterval(1,4);
+              p_cost = this.randomIntFromInterval(50,500);
+              e_cost = this.randomIntFromInterval(10,100);
+              o_cost = 0;
+              this.spawnWave(enemyQty, 0, p_cost, e_cost, o_cost);
             }
-
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
                 if(this.checkEnemy(newPos)) {
