@@ -99,18 +99,30 @@ app.Game.prototype = {
                                 this.sprite.y = enemyPos.y;
                             }
                         } else {
-                            var index = enemies.indexOf(this);
-                            enemies.splice(index,1);
-                            this.sprite.destroy();
+                            this.remove();
                         }
                     }
                 }).bind(this));
                 easystar.calculate();
+            },
+            remove: function () {
+                var index = enemies.indexOf(this);
+                enemies.splice(index,1);
+                this.sprite.destroy();
             }
         };
         var enemyPos = this.returnGridPos(enemy.pos);
         enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
         enemies.push(enemy);
+    },
+    checkEnemy: function (pos) {
+        for (i =  0; i < enemies.length; i++) {
+            if (enemies[i].pos.x == pos.x && enemies[i].pos.y == pos.y) {
+                enemies[i].remove();
+                return true;
+            }
+            return false;
+        }
     },
     canMoveToTile : function (pos) {
         if (pos.x < 0 || pos.x >= gridSize.width) {
@@ -144,12 +156,18 @@ app.Game.prototype = {
 
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
-                map[player.pos.y][player.pos.x] = tileID.free;
-                map[newPos.y][newPos.x]         = tileID.player;
-                player.pos = newPos;
-                var gridPos = this.returnGridPos(player.pos);
-                player.sprite.x = gridPos.x;
-                player.sprite.y = gridPos.y;
+                if(this.checkEnemy(newPos)) {
+
+
+                } else {
+                    map[player.pos.y][player.pos.x] = tileID.free;
+                    map[newPos.y][newPos.x]         = tileID.player;
+                    player.pos = newPos;
+                    var gridPos = this.returnGridPos(player.pos);
+                    player.sprite.x = gridPos.x;
+                    player.sprite.y = gridPos.y;
+                }
+
                 turn = 1;
             }
         }
@@ -158,7 +176,6 @@ app.Game.prototype = {
         if (turn == 1) {
             for (i =  0; i < enemies.length; i++) {
                 enemies[i].think();
-
             }
             turn = 0;
         }
