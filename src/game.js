@@ -146,6 +146,7 @@ app.Game.prototype = {
 
                                 }
                             } else {
+                                player.takeDamage();
                                 this.remove();
                             }
                         }
