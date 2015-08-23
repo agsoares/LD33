@@ -10,7 +10,12 @@ var tileID = {
     exit    : 4
 };
 
-var turn = 0;
+var turnID = {
+  player  : 0,
+  enemy   : 1
+};
+
+var turn = turnID.player;
 var easystar;
 var score = 0;
 var scorePerKIll = 10;
@@ -24,15 +29,16 @@ var exit = {x: gridSize.width-1, y: 0 };
 var turnTimer = 0;
 var maxTurnsToNextWave = Math.floor(Math.sqrt(Math.pow(gridSize.width,2)+Math.pow(gridSize.height,2)));
 var waveTimer = Math.floor(Math.sqrt(Math.pow(gridSize.width,2)+Math.pow(gridSize.height,2)));
+
+var playerTotalHealth = 6;
 var player =  {
     sprite : {},
     pos : {x:0,y: 0},
-    health: 6,
+    health: playerTotalHealth,
     takeDamage : function(){
         if(this.health > 0){
           this.health--;
           labelLife.text = this.health.toString();
-          console.log(this.health);
         }
     },
     isDead: function(){
@@ -64,6 +70,13 @@ app.Game.prototype = {
         };
     },
     create: function() {
+        score = 0;
+        player.health = playerTotalHealth;
+        player.pos = {x:0,y:0};
+        turnTimer = 0;
+        canSpawnWave = true;
+        turn = turnID.player;
+        enemies = [];
         background_layer = app.game.add.group();
         foreground_layer = app.game.add.group();
         hud_layer        = app.game.add.group();
@@ -255,6 +268,7 @@ app.Game.prototype = {
                 newPos.y++;
             }
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
+
                 turnTimer = 0.75;
 
                 if(this.canAttackTile(newPos,tileID.enemy)) {
@@ -265,7 +279,6 @@ app.Game.prototype = {
                           enemies[i].remove();
                       }
                   }
-                //  console.log("Matei.");
 
                 } else {
                     map[player.pos.y][player.pos.x] = tileID.free;
@@ -277,8 +290,7 @@ app.Game.prototype = {
                     waveTimer--;
 
                 }
-                console.log(score);
-                turn = 1;
+                turn = turnID.enemy;
             }
         }
 
@@ -287,7 +299,7 @@ app.Game.prototype = {
             for (i =  0; i < enemies.length; i++) {
                 enemies[i].think();
             }
-            turn = 0;
+            turn = turnID.player;
         }
     }
 };
