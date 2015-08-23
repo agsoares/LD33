@@ -97,9 +97,15 @@ app.Game.prototype = {
         if (pos.y < 0 || pos.y >= gridSize.height) {
             return false;
         }
-        return true;
+      //  var gridPosition = this.returnGridPos(pos);
+        if(map[pos.y][pos.x] == tileID.free)
+          return true;
+
+        return false;
     },
     update: function() {
+    //  app.game.time.advancedTiming = true;
+      //console.log(app.game.time.fps);
         turnTimer-= app.game.time.elapsed/100;
         if (turnTimer <= 0 ) {
             var newPos = { x: player.pos.x, y: player.pos.y };
