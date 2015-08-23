@@ -21,7 +21,8 @@ var gridSize = { width: 19, height: 19 };
 var exit = {x: gridSize.width-1, y: 0 };
 
 var turnTimer = 0;
-
+var maxTurnsToNextWave = Math.floor(Math.sqrt(Math.pow(gridSize.width,2)+Math.pow(gridSize.height,2)));
+var waveTimer = Math.floor(Math.sqrt(Math.pow(gridSize.width,2)+Math.pow(gridSize.height,2)));
 var player =  {
     sprite : {},
     pos : {x:0,y: 0},
@@ -185,6 +186,15 @@ app.Game.prototype = {
     },
     update: function() {
         turnTimer-= app.game.time.elapsed/100;
+        if(canSpawnWave || waveTimer <= 0){
+          enemyQty = this.randomIntFromInterval(1,4);
+          p_cost = this.randomIntFromInterval(50,500);
+          e_cost = this.randomIntFromInterval(10,100);
+          o_cost = 0;
+          this.spawnWave(enemyQty, 0, p_cost, e_cost, o_cost);
+          this.waveTimer = this.maxTurnsToNextWave; 
+        }
+
         if (turnTimer <= 0 ) {
             var newPos = { x: player.pos.x, y: player.pos.y };
             if (app.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -195,12 +205,6 @@ app.Game.prototype = {
                 newPos.y--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
                 newPos.y++;
-            }else if(app.game.input.keyboard.isDown(Phaser.Keyboard.S) && canSpawnWave){
-              enemyQty = this.randomIntFromInterval(1,4);
-              p_cost = this.randomIntFromInterval(50,500);
-              e_cost = this.randomIntFromInterval(10,100);
-              o_cost = 0;
-              this.spawnWave(enemyQty, 0, p_cost, e_cost, o_cost);
             }
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
@@ -214,6 +218,8 @@ app.Game.prototype = {
                     var gridPos = this.returnGridPos(player.pos);
                     player.sprite.x = gridPos.x;
                     player.sprite.y = gridPos.y;
+                    waveTimer--;
+
                 }
 
                 turn = 1;
