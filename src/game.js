@@ -50,7 +50,7 @@ app.Game.prototype = {
     preload: function() {
 
     },
-    returnGridPos : function (pos) {
+    returnScreenPos : function (pos) {
         return {
             x: pos.x*tileSize + app.game.width/2   -gridSize.width  *tileSize/2,
             y: pos.y*tileSize + app.game.height/2  -gridSize.height *tileSize/2
@@ -61,12 +61,12 @@ app.Game.prototype = {
             map[i] = [];
             for (j = 0 ; j < gridSize.width; j++ ) {
                 map[i][j] = tileID.free;
-                var pos = this.returnGridPos({x: j, y: i});
+                var pos = this.returnScreenPos({x: j, y: i});
                 var tile = app.game.add.sprite(pos.x, pos.y, 'tileset', map[i][j]);
             }
         }
 
-        var gridPos = this.returnGridPos(player.pos);
+        var gridPos = this.returnScreenPos(player.pos);
         map[player.pos.y][player.pos.x] = tileID.player;
         player.sprite = app.game.add.sprite(gridPos.x,gridPos.y, 'tileset', 2);
 
@@ -112,12 +112,15 @@ app.Game.prototype = {
                     if (path !== null) {
                         if (path.length > 0) {
                             if(this.parent.canMoveToTile(path[1])){
+                                map[this.pos.y][this.pos.x] = tileID.free;
                                 this.pos.x = path[1].x;
                                 this.pos.y = path[1].y;
+                                map[this.pos.y][this.pos.x] = tileID.enemy;
                                 this.parent.canMoveToTile(this.pos);
-                                var enemyPos = this.parent.returnGridPos(this.pos);
+                                var enemyPos = this.parent.returnScreenPos(this.pos);
                                 this.sprite.x = enemyPos.x;
                                 this.sprite.y = enemyPos.y;
+
                             }
                         } else {
                             this.remove();
@@ -144,7 +147,7 @@ app.Game.prototype = {
                 }
             }
         };
-        var enemyPos = this.returnGridPos(enemy.pos);
+        var enemyPos = this.returnScreenPos(enemy.pos);
         enemy.sprite = app.game.add.sprite(enemyPos.x,enemyPos.y, 'tileset', 3);
         enemies.push(enemy);
     },
@@ -173,8 +176,20 @@ app.Game.prototype = {
         if (this.isTileOffBoardLimits(pos)) {
             return false;
         }
-
+/**
         if(map[pos.y][pos.x] != tileID.free) {
+
+            return false;
+        }
+  **/
+        return true;
+    },
+    canAttackTile : function (pos, type) {
+        if (this.isTileOffBoardLimits(pos)) {
+            return false;
+        }
+
+        if(map[pos.y][pos.x] != type) {
 
             return false;
         }
@@ -208,14 +223,21 @@ app.Game.prototype = {
             }
             if ((player.pos.x != newPos.x || player.pos.y != newPos.y) && this.canMoveToTile(newPos)) {
                 turnTimer = 0.75;
-                if(this.checkEnemy(newPos)) {
-
+                console.log("fora "+this.canAttackTile(newPos,tileID.enemy));
+                if(this.canAttackTile(newPos,tileID.enemy)) {
+                  for (i =  0; i < enemies.length; i++) {
+                      if (enemies[i].pos.x == newPos.x && enemies[i].pos.y == newPos.y) {
+                          map[newPos.y][newPos.x] = tileID.free;
+                          enemies[i].remove();
+                      }
+                  }
+                  console.log("Matei.");
 
                 } else {
                     map[player.pos.y][player.pos.x] = tileID.free;
                     map[newPos.y][newPos.x]         = tileID.player;
                     player.pos = newPos;
-                    var gridPos = this.returnGridPos(player.pos);
+                    var gridPos = this.returnScreenPos(player.pos);
                     player.sprite.x = gridPos.x;
                     player.sprite.y = gridPos.y;
                     waveTimer--;
