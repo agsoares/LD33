@@ -24,7 +24,19 @@ var turnTimer = 0;
 
 var player =  {
     sprite : {},
-    pos : {x:0,y: 0}
+    pos : {x:0,y: 0},
+    health: 6,
+    takeDamage : function(){
+        if(this.health > 0){
+          this.health--;
+        }
+    },
+    isDead: function(){
+        if(this.health > 0){
+          return false;
+        }
+        return true;
+    }
 };
 
 
@@ -121,6 +133,9 @@ app.Game.prototype = {
                 newPos.x--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
                 newPos.x++;
+                player.takeDamage();
+                console.log(player.health);
+                console.log(player.isDead());
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
                 newPos.y--;
             } else if (app.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
@@ -142,7 +157,6 @@ app.Game.prototype = {
 
         if (turn == 1) {
             for (i =  0; i < enemies.length; i++) {
-                console.log("meh")
                 enemies[i].think();
 
             }
