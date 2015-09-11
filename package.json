@@ -1,0 +1,24 @@
+{
+  "name": "LD33",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agsoares/LD33.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agsoares/LD33/issues"
+  },
+  "homepage": "https://github.com/agsoares/LD33",
+  "devDependencies": {
+    "browser-sync": "^2.9.3",
+    "gulp": "^3.9.0",
+    "gulp-coffee": "^2.3.1"
+  }
+}
