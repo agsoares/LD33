@@ -1,12 +1,15 @@
-var app = app || {};
+var app;
 
-app.game = new Phaser.Game(800, 600, Phaser.AUTO, '');
+app = {};
 
-app.game.state.add('Boot',    app.Boot);
-app.game.state.add('Preload', app.Preload);
-app.game.state.add('Menu',app.Menu);
-app.game.state.add('Game',    app.Game);
-app.game.state.add('GameOver',app.GameOver);
+require.config({
+  waitSeconds: 0
+});
 
-
-app.game.state.start('Boot');
+require(['config', 'boot', 'preloader', 'game', '../lib/phaser.min'], function(Config, Boot, Preloader, Game) {
+  app.game = new Phaser.Game(Config.width, Config.height, Phaser.AUTO, 'game-container', null);
+  app.game.state.add('Boot', Boot, false);
+  app.game.state.add('Preloader', Preloader, false);
+  app.game.state.add('Game', Game, false);
+  app.game.state.start('Boot');
+});
