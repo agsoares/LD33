@@ -8,7 +8,7 @@ define 'preloader', ['../lib/phaser.min'], () ->
       return
 
     create: ->
-      app.game.state.start 'Game'
+      app.game.state.start 'Menu'
       return
 
     update: ->

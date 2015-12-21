@@ -8,9 +8,9 @@ define 'game', ['player', 'enemy', '../lib/phaser.min'], (Player, Enemy) ->
 
     create: ->
       @layers = {
-        backgronud: app.game.add.group(),
-        foreground: app.game.add.group(),
-        hud:        app.game.add.group()
+          backgronud: app.game.add.group(),
+          foreground: app.game.add.group(),
+          hud:        app.game.add.group()
       }
 
 

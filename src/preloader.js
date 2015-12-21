@@ -19,7 +19,7 @@ define('preloader', ['../lib/phaser.min'], function() {
     };
 
     Preloader.prototype.create = function() {
-      app.game.state.start('Game');
+      app.game.state.start('Menu');
     };
 
     Preloader.prototype.update = function() {};

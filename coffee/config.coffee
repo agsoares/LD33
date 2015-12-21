@@ -10,6 +10,6 @@ define 'config', () ->
 
     @returnScreenPos: (pos) =>
       return {
-          x: pos.x*@tileSize + @width/2   -@gridSize.width  *@tileSize/2,
-          y: pos.y*@tileSize + @height/2  -@gridSize.height *@tileSize/2
+        x: pos.x*@tileSize + @width/2   -@gridSize.width  *@tileSize/2,
+        y: pos.y*@tileSize + @height/2  -@gridSize.height *@tileSize/2
       }

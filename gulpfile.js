@@ -1,9 +1,11 @@
 var gulp    = require('gulp'),
 coffee      = require('gulp-coffee'),
+plumber     = require('gulp-plumber')
 browserSync = require('browser-sync').create();
 
 gulp.task('coffeescript', function () {
     gulp.src('./coffee/**/*.coffee')
+    .pipe(plumber())
     .pipe(coffee({ bare: true }))
     .pipe(gulp.dest('./src/'));
 });
