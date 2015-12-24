@@ -1,6 +1,6 @@
 app = app || {}
 
-define 'preloader', ['../lib/phaser.min'], () ->
+define 'preloader', ['phaser'], () ->
   class Preloader extends Phaser.Stage
     preload: ->
       @load.image 'logo', 'assets/HTML5.png'

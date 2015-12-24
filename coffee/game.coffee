@@ -1,6 +1,6 @@
 app = app || {}
 
-define 'game', ['player', 'enemy', '../lib/phaser.min'], (Player, Enemy) ->
+define 'game', ['player', 'enemy', 'phaser'], (Player, Enemy) ->
   class Game extends Phaser.Stage
     preload: ->
       return

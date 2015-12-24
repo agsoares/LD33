@@ -1,4 +1,4 @@
 app = app || {}
 
-define 'enemy', ['../lib/phaser.min'], () ->
+define 'enemy', ['phaser'], () ->
   class Enemy extends Phaser.Sprite

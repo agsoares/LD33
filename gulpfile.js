@@ -1,6 +1,9 @@
 var gulp    = require('gulp'),
 coffee      = require('gulp-coffee'),
-plumber     = require('gulp-plumber')
+amdOptimize = require("amd-optimize"),
+concat      = require('gulp-concat'),
+uglify      = require("gulp-uglify"),
+plumber     = require('gulp-plumber'),
 browserSync = require('browser-sync').create();
 
 gulp.task('coffeescript', function () {
@@ -10,14 +13,23 @@ gulp.task('coffeescript', function () {
     .pipe(gulp.dest('./src/'));
 });
 
-gulp.task('reload', ['coffeescript'],  browserSync.reload);
+gulp.task('build', ['coffeescript'], function () {
+    gulp.src(["src/**/*.js"])
+    .pipe(plumber())
+    .pipe(amdOptimize("main", {baseURL: './src', configFile: 'src/main.js'}))
+    .pipe(concat("app.js"))
+    .pipe(uglify())
+    .pipe(gulp.dest("./"));
+});
+
+gulp.task('reload', ['build'],  browserSync.reload);
 
 gulp.task('stream', function () {
     gulp.src('./css/**/*.css')
     .pipe(browserSync.stream());
 });
 
-gulp.task('serve', ['coffeescript'], function() {
+gulp.task('serve', ['build'], function() {
     browserSync.init({
           server: {
               baseDir: "./"

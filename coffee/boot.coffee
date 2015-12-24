@@ -1,6 +1,6 @@
 app = app || {}
 
-define 'boot', ['../lib/phaser.min'], () ->
+define 'boot', ['phaser'], () ->
   class Boot extends Phaser.Stage
     preload: ->
       return

@@ -1,6 +1,6 @@
 app = app || {}
 
-define 'player', ['config', '../lib/phaser.min'], (Config) ->
+define 'player', ['config', 'phaser'], (Config) ->
   class Player extends Phaser.Sprite
     constructor: (x, y) ->
       @gridPos = { x: x, y: y }

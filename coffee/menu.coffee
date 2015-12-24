@@ -1,6 +1,6 @@
 app = app || {}
 
-define 'menu', ['../lib/phaser.min'], () ->
+define 'menu', ['phaser'], () ->
   class Menu extends Phaser.Stage
     preload: ->
       return
