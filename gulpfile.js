@@ -3,6 +3,7 @@ coffee      = require('gulp-coffee'),
 amdOptimize = require("amd-optimize"),
 concat      = require('gulp-concat'),
 uglify      = require("gulp-uglify"),
+sourcemaps  = require('gulp-sourcemaps'),
 plumber     = require('gulp-plumber'),
 browserSync = require('browser-sync').create();
 
@@ -15,10 +16,12 @@ gulp.task('coffeescript', function () {
 
 gulp.task('build', ['coffeescript'], function () {
     gulp.src(["src/**/*.js"])
+    .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(plumber())
     .pipe(amdOptimize("main", {baseURL: './src', configFile: 'src/main.js'}))
     .pipe(concat("app.js"))
     .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest("./"));
 });
 
